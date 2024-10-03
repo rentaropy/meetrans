@@ -107,10 +107,10 @@ class MeeTrans:
         default_output = f"meetrans_output_{today_str}.txt"
 
         # 使用可能なモデルのリスト
-        available_models = ['tiny', 'base', 'small', 'medium', 'large-v3', 'turbo']
+        available_models = ['tiny', 'base', 'small', 'medium', 'large-v3']
 
         # ArgumentParserオブジェクトの作成
-        parser = argparse.ArgumentParser(description='AIモデルで音声ファイルを文字起こしし、テキストファイルとして保存するプログラム')
+        parser = argparse.ArgumentParser(prog='meetrans', description='AIモデルで音声ファイルを文字起こしし、テキストファイルとして保存するプログラム')
 
         # 第1引数: 音声ファイルのパス (必須)
         parser.add_argument('audio_file', type=str, help='入力するオーディオファイルのパス')
