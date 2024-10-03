@@ -23,7 +23,9 @@ class MeeTrans:
         self.setup_logging()
         
         # Whisperモデルのインスタンスを作成
-        model_path = './models'
+        cwd = os.getcwd().replace('\\', '/')
+        
+        model_path = f'{cwd}/models'
         os.makedirs(model_path, exist_ok=True)
         self.whisper_model = WhisperModel(model, device="cuda", compute_type="float16", download_root=model_path)
 
