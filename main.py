@@ -11,7 +11,7 @@ class MeeTrans:
         Args:
             audio_file (str): 入力するオーディオファイルのパス。
             output_file (str): 出力先のテキストファイルのパス。
-            model (str, optional): 使用するAIモデル名。デフォルトは'small'。
+            model (str, optional): 使用するAIモデル名。デフォルトは'large-v3'。
             timestamp (bool): タイムスタンプを出力に含めるかどうかのフラグ。
             prompt_file (str, optional): 用語集や参考文を記載したテキストファイルのパス。デフォルトは指定なし。
         """
@@ -125,9 +125,9 @@ class MeeTrans:
         parser.add_argument('--output', '-o', type=str, default=default_output, 
                             help=f'出力先のテキストファイルのパス（指定がない場合はカレントディレクトリの "{default_output}" に保存されます）')
 
-        # オプション: 使用するAIモデルの指定 (任意、デフォルトは'small')
-        parser.add_argument('--model', '-m', type=str, choices=available_models, default='small',
-                            help=f"使用するAIモデルを指定（オプション）。例: {', '.join(available_models)} (指定がない場合は 'small' が使用されます)")
+        # オプション: 使用するAIモデルの指定 (任意、デフォルトは'large-v3')
+        parser.add_argument('--model', '-m', type=str, choices=available_models, default='large-v3',
+                            help=f"使用するAIモデルを指定（オプション）。例: {', '.join(available_models)} (指定がない場合は 'large-v3' が使用されます)")
 
         # オプション: 用語集や参考文を記載したテキストファイルのパス (任意、デフォルトは指定なし)
         parser.add_argument('--prompt', '-p', type=str, 
