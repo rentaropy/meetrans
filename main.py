@@ -5,19 +5,21 @@ import logging
 from faster_whisper import WhisperModel
 
 class MeeTrans:
-    def __init__(self, audio_file, output_file, model, prompt_file=None):
+    def __init__(self, audio_file, output_file, model, timestamp, prompt_file=None):
         """MeeTransクラスの初期化メソッド。
 
         Args:
             audio_file (str): 入力するオーディオファイルのパス。
             output_file (str): 出力先のテキストファイルのパス。
             model (str, optional): 使用するAIモデル名。デフォルトは'small'。
+            timestamp (bool): タイムスタンプを出力に含めるかどうかのフラグ。
             prompt_file (str, optional): 用語集や参考文を記載したテキストファイルのパス。デフォルトは指定なし。
         """
         self.audio_file = audio_file
         self.output_file = output_file
         self.model = model
-        self.prompt_file = prompt_file  # 用語集や参考文のファイルパス
+        self.timestamp = timestamp  # タイムスタンプのフラグ
+        self.prompt_file = prompt_file
         self.setup_logging()
         
         # Whisperモデルのインスタンスを作成
@@ -41,7 +43,7 @@ class MeeTrans:
         テキストファイルとして保存します。
         """
         # コマンドライン引数の確認
-        self.logger.info(f"[MeeTrans.transcribe] 引数確認: audio_file='{self.audio_file}', output_file='{self.output_file}', model='{self.model}', prompt_file='{self.prompt_file}'")
+        self.logger.info(f"[MeeTrans.transcribe] 引数確認: audio_file='{self.audio_file}', output_file='{self.output_file}', model='{self.model}', prompt_file='{self.prompt_file}', timestamp={self.timestamp}")
 
         self.logger.info(f"[MeeTrans.transcribe] 音声ファイル '{self.audio_file}' をモデル '{self.model}' で文字起こし中...")
 
@@ -57,7 +59,7 @@ class MeeTrans:
             self.audio_file,
             language="ja",
             vad_filter=True,
-            initial_prompt=initial_prompt  # 読み込んだプロンプトを引数に渡す
+            initial_prompt=initial_prompt
         )
 
         self.save_transcription(segments)
@@ -86,9 +88,13 @@ class MeeTrans:
         """
         with open(self.output_file, "w", encoding="utf-8") as f:
             for segment in segments:
-                start = self.format_timestamp(segment.start)
-                end = self.format_timestamp(segment.end)
-                f.write(f'[{start} -> {end}] {segment.text}\n')
+                # タイムスタンプを含めるかどうかに応じて出力内容を決定
+                if self.timestamp:
+                    start = self.format_timestamp(segment.start)
+                    end = self.format_timestamp(segment.end)
+                    f.write(f'[{start} -> {end}] {segment.text}\n')
+                else:
+                    f.write(f'{segment.text}\n')
         self.logger.info(f"[MeeTrans.save_transcription] 文字起こし結果を '{self.output_file}' に保存しました。")
 
     @staticmethod
@@ -127,6 +133,10 @@ class MeeTrans:
         parser.add_argument('--prompt', '-p', type=str, 
                             help='用語集や参考文を記載したテキストファイルのパス（オプション）。デフォルトは指定なし。')
 
+        # オプション: タイムスタンプを含めるかどうか (任意、デフォルトは含める)
+        parser.add_argument('--timestamp', '-t', action='store_true', 
+                            help='出力にタイムスタンプを含めるかどうか（指定がない場合は含まれます）')
+
         # 引数をパース
         return parser.parse_args()
 
@@ -141,7 +151,7 @@ def main():
     args = MeeTrans.parse_arguments()
 
     # MeeTransクラスのインスタンスを作成し、文字起こしを実行
-    transcriber = MeeTrans(args.audio_file, args.output, args.model, args.prompt)
+    transcriber = MeeTrans(args.audio_file, args.output, args.model, args.timestamp, args.prompt)
     transcriber.transcribe()
 
 
